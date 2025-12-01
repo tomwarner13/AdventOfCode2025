@@ -10,9 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using AdventOfCode2024.Util;
+using AdventOfCode2025.Util;
 
-namespace AdventOfCode2024.Day$1
+namespace AdventOfCode2025.Day$1
 {
   public class Day$1Problems : Problems
   {
