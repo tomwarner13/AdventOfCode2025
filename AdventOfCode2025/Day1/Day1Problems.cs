@@ -4,67 +4,93 @@ namespace AdventOfCode2025.Day1;
 
 public class Day1Problems : Problems
 {
-  protected override string TestInput => @"3   4
-4   3
-2   5
-1   3
-3   9
-3   3";
+  protected override string TestInput => @"R50
+L68
+L30
+R48
+L5
+R60
+L55
+L1
+L99
+R14
+L82";
 
   protected override int Day => 1;
 
   protected override string Problem1(string[] input, bool isTestInput)
   {
-    var distanceSum = 0;
-    var firstLocs = new List<int>();
-    var secondLocs = new List<int>();
+    DebugMode = isTestInput;
+    
+    var zeroesEncountered = 0;
+    var currentPos = 50;
 
     foreach (var line in input)
     {
-      var ints = StringUtils.ExtractIntsFromString(line).ToArray();
-      firstLocs.Add(ints[0]);
-      secondLocs.Add(ints[1]);
+      var sign = line[0] == 'L' ?  -1 : 1;
+      var clicks = StringUtils.ExtractIntsFromString(line).First();
+      var movement = clicks * sign;
+      
+      currentPos = DoMovement(movement, currentPos);
+      D(currentPos);
+      if(currentPos == 0) zeroesEncountered++;
     }
     
-    firstLocs.Sort();
-    secondLocs.Sort();
+    return zeroesEncountered.ToString();
+  }
 
-    for (var i = 0; i < firstLocs.Count; i++)
+  private static int DoMovement(int movement, int currentPos)
+  {
+    var rawResult = currentPos + movement;
+    if (rawResult >= 0)
     {
-      distanceSum += Math.Abs(firstLocs[i] - secondLocs[i]);
+      return rawResult % 100;
     }
-    return distanceSum.ToString();
+    while (rawResult < 0) rawResult += 100;
+    return rawResult;
   }
 
   protected override string Problem2(string[] input, bool isTestInput)
-  {
-    var similarity = 0;
-    var firstLocs = new List<int>();
-    var secondLocsByCount = new Dictionary<int, int>();
+  {    
+    DebugMode = isTestInput;
+    
+    var zeroesEncountered = 0;
+    var currentPos = 50;
 
     foreach (var line in input)
     {
-      var ints = StringUtils.ExtractIntsFromString(line).ToArray();
-      firstLocs.Add(ints[0]);
-      var secondLoc = ints[1];
-      if (secondLocsByCount.ContainsKey(secondLoc))
-      {
-        secondLocsByCount[secondLoc]++;
-      }
-      else
-      {
-        secondLocsByCount[secondLoc] = 1;
-      }
+      var sign = line[0] == 'L' ?  -1 : 1;
+      var clicks = StringUtils.ExtractIntsFromString(line).First();
+      var movement = clicks * sign;
+      
+      D(line);
+      var result = DoMovementAndCountPasses(movement, currentPos);
+      D($"pos: {result.finalPos}, zs: {result.zeroesPassed}");
+      currentPos = result.finalPos;
+      zeroesEncountered += result.zeroesPassed;
     }
-
-    foreach (var loc in firstLocs)
+    
+    return zeroesEncountered.ToString();
+  }
+  
+  private static (int finalPos, int zeroesPassed) DoMovementAndCountPasses(int movement, int currentPos)
+  {
+    var rawResult = currentPos + movement;
+    switch (rawResult)
     {
-      if (secondLocsByCount.ContainsKey(loc))
-      {
-        similarity += secondLocsByCount[loc] * loc;
-      }
+      case 0:
+        return (rawResult, 1);
+      case > 0:
+        return (rawResult % 100, rawResult / 100);
     }
 
-    return similarity.ToString();
+    var  zeroesPassed = currentPos == 0 ? -1 : 0;
+    while (rawResult < 0)
+    {
+      rawResult += 100;
+      zeroesPassed++;
+    }
+    if(rawResult == 0) zeroesPassed++;
+    return (rawResult, zeroesPassed);
   }
 }
