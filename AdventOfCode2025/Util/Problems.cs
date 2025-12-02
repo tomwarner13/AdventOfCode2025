@@ -4,8 +4,28 @@ public abstract class Problems
 {
   //TODO refactor to be an array of strings (each can be split to lines on \n) and live in a partial class in its own file
   protected abstract string TestInput { get; }
+  
+  private string[] _testInputLines = [];
+
+  private string[] ReadTestInput()
+  {
+    if(_testInputLines.Length > 0) return _testInputLines;
+    
+    _testInputLines = TestInput.Split('\n').Select(s => s.Trim()).ToArray();
+    return _testInputLines;
+  }
 
   private string FullInputFilePath => $"Day{Day}\\D{Day}.txt";
+  
+  private string[] _fullInputLines = [];
+
+  private string[] ReadFullInput()
+  {
+    if(_fullInputLines.Length > 0) return _fullInputLines;
+    
+    _fullInputLines = File.ReadAllLines(FullInputFilePath);
+    return _fullInputLines;
+  }
 
   protected abstract int Day { get; }
   protected bool DebugMode = false;
@@ -15,25 +35,25 @@ public abstract class Problems
 
   public string Problem1TestInput()
   {
-    var lines = TestInput.Split('\n').Select(s => s.Trim()).ToArray();
+    var lines = ReadTestInput();
     return Problem1(lines, true);
   }
 
   public string Problem2TestInput()
   {
-    var lines = TestInput.Split('\n').Select(s => s.Trim()).ToArray();
+    var lines = ReadTestInput();
     return Problem2(lines, true);
   }
 
   public string Problem1FullInput()
   {
-    var lines = File.ReadAllLines(FullInputFilePath);
+    var lines = ReadFullInput();
     return Problem1(lines, false);
   }
 
   public string Problem2FullInput()
   {
-    var lines = File.ReadAllLines(FullInputFilePath);
+    var lines = ReadFullInput();
     return Problem2(lines, false);
   }
 

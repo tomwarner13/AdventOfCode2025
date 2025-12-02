@@ -1,12 +1,19 @@
 ﻿// ReSharper disable RedundantUsingDirective
-// See https://aka.ms/new-console-template for more information
-
-//TODO add every day as using
 using AdventOfCode2025.Day1;
 using AdventOfCode2025.Day2;
+using AdventOfCode2025.Day3;
+using AdventOfCode2025.Day4;
+using AdventOfCode2025.Day5;
+using AdventOfCode2025.Day6;
+using AdventOfCode2025.Day7;
+using AdventOfCode2025.Day8;
+using AdventOfCode2025.Day9;
+using AdventOfCode2025.Day10;
+using AdventOfCode2025.Day11;
+using AdventOfCode2025.Day12;
 using AdventOfCode2025.Util;
 
-var problems = new Day1Problems();
+var problems = new Day2Problems();
 DoAllProblems(problems);
 return;
 

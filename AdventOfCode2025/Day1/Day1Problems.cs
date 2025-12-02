@@ -4,8 +4,7 @@ namespace AdventOfCode2025.Day1;
 
 public class Day1Problems : Problems
 {
-  protected override string TestInput => @"R50
-L68
+  protected override string TestInput => @"L68
 L30
 R48
 L5

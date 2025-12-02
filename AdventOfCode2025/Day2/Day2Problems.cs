@@ -5,120 +5,56 @@ namespace AdventOfCode2025.Day2;
 
 public class Day2Problems : Problems
 {
-  protected override string TestInput => @"7 6 4 2 1
-1 2 7 8 9
-9 7 6 2 1
-1 3 2 4 5
-8 6 4 4 1
-1 3 6 7 9
-8 9 8 7 6 5 4";
+  protected override string TestInput => 
+    "824824821-824824827,11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449,38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124";
 
   protected override int Day => 2;
 
   protected override string Problem1(string[] input, bool isTestInput)
   {
-    var safeReports = 0;
-    foreach (var line in input)
+    DebugMode = isTestInput;
+    var invalidIds = 0L;
+    
+    var inputRanges = input[0].Split(',');
+    foreach (var range in inputRanges)
     {
-      var report = StringUtils.ExtractIntsFromString(line).ToArray();
-      if(IsReportSafe(report)) safeReports++;
+      D(range);
+      var ends = StringUtils.ExtractLongsFromString(range).ToArray();
+      var min = ends[0];
+      var max = ends[1];
+
+      var nextInvalid = GetNextInvalidId(min - 1); //inclusive!
+      while (nextInvalid <= max)
+      {
+        D(nextInvalid);
+        invalidIds += nextInvalid;
+        nextInvalid = GetNextInvalidId(nextInvalid);
+      }
     }
-    return safeReports.ToString();
+    
+    return invalidIds.ToString();
   }
 
   protected override string Problem2(string[] input, bool isTestInput)
   {
-    var safeReports = 0;
-    foreach (var line in input)
-    {
-      var report = StringUtils.ExtractIntsFromString(line).ToArray();
-      if (IsReportSafeWithDampener(report))
-        safeReports++;
-    }
-    return safeReports.ToString();
+    throw new NotImplementedException();
   }
 
-  private static bool IsReportSafe(int[] report)
+  private static long GetNextInvalidId(long input)
   {
-    var isIncreasing = report[0] < report[1];
-
-    if (isIncreasing)
+    var idStr = input.ToString();
+    if (idStr.Length % 2 != 0)
     {
-      for (var i = 1; i < report.Length; i++)
-      {
-        var curNum = report[i];
-        var lastNum = report[i - 1];
-        var diff = curNum - lastNum;
-
-        if (diff is < 1 or > 3)
-          return false;
-      }
-    }
-    else
-    {
-      for (var i = 1; i < report.Length; i++)
-      {
-        var curNum = report[i];
-        var lastNum = report[i - 1];
-        var diff = lastNum - curNum;
-
-        if (diff is < 1 or > 3)
-          return false;
-      }
+      var zeroes = idStr.Length / 2;
+      var numPart = "1".PadRight(zeroes + 1, '0'); //padding includes first char
+      return long.Parse(numPart + numPart);
     }
 
-    return true;
-  }
-  
-  private static bool IsReportSafeWithDampener(int[] report)
-  {
-    var isIncreasing = report[0] < report[1];
+    var firstHalf = long.Parse(idStr[..(idStr.Length / 2)]);
+    var secondHalf = long.Parse(idStr[(idStr.Length / 2)..]);
 
-    if (isIncreasing)
-    {
-      for (var i = 1; i < report.Length; i++)
-      {
-        var curNum = report[i];
-        var lastNum = report[i - 1];
-        var diff = curNum - lastNum;
-
-        if (diff is < 1 or > 3)
-        {
-          var missingLastNum = RemoveAtIndex(report, i - 1);
-          var missingCurNum = RemoveAtIndex(report, i);
-          //also attempt removing the first number! changing the move order may turn a report safe
-          var missingFirstNum = RemoveAtIndex(report, 0);
-
-          return IsReportSafe(missingLastNum) || IsReportSafe(missingCurNum) || IsReportSafe(missingFirstNum);
-        }
-      }
-    }
-    else
-    {
-      for (var i = 1; i < report.Length; i++)
-      {
-        var curNum = report[i];
-        var lastNum = report[i - 1];
-        var diff = lastNum - curNum;
-
-        if (diff is < 1 or > 3)
-        {
-          var missingLastNum = RemoveAtIndex(report, i - 1);
-          var missingCurNum = RemoveAtIndex(report, i);
-          var missingFirstNum = RemoveAtIndex(report, 0);
-          
-          return IsReportSafe(missingLastNum) || IsReportSafe(missingCurNum) || IsReportSafe(missingFirstNum);
-        }
-      }
-    }
-
-    return true;
-  }
-
-  private static int[] RemoveAtIndex(int[] values, int index)
-  {
-    var list = values.ToList();
-    list.RemoveAt(index);
-    return list.ToArray();
+    return long.Parse(firstHalf > secondHalf ? 
+      $"{firstHalf}{firstHalf}" : 
+      $"{firstHalf + 1}{firstHalf + 1}");
   }
 }
