@@ -36,24 +36,28 @@ public abstract class Problems
   public string Problem1TestInput()
   {
     var lines = ReadTestInput();
+    DebugMode = true;
     return Problem1(lines, true);
   }
 
   public string Problem2TestInput()
   {
     var lines = ReadTestInput();
+    DebugMode = true;
     return Problem2(lines, true);
   }
 
   public string Problem1FullInput()
   {
     var lines = ReadFullInput();
+    DebugMode = false;
     return Problem1(lines, false);
   }
 
   public string Problem2FullInput()
   {
     var lines = ReadFullInput();
+    DebugMode = false;
     return Problem2(lines, false);
   }
 

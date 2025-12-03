@@ -1,9 +1,11 @@
-﻿using AdventOfCode2025.Util;
+﻿namespace AdventOfCode2025.Day1;
 
-namespace AdventOfCode2025.Day1;
+using Util;
 
 public class Day1Problems : Problems
 {
+  protected override int Day => 1;
+  
   protected override string TestInput => @"L68
 L30
 R48
@@ -15,12 +17,8 @@ L99
 R14
 L82";
 
-  protected override int Day => 1;
-
   protected override string Problem1(string[] input, bool isTestInput)
   {
-    DebugMode = isTestInput;
-    
     var zeroesEncountered = 0;
     var currentPos = 50;
 
@@ -50,9 +48,7 @@ L82";
   }
 
   protected override string Problem2(string[] input, bool isTestInput)
-  {    
-    DebugMode = isTestInput;
-    
+  {
     var zeroesEncountered = 0;
     var currentPos = 50;
 

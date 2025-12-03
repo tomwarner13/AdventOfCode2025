@@ -1,66 +1,88 @@
-﻿using System.Text.RegularExpressions;
-using AdventOfCode2025.Util;
+﻿namespace AdventOfCode2025.Day3;
 
-namespace AdventOfCode2025.Day3;
+using Util;
 
 public class Day3Problems : Problems
 {
-  private static readonly Regex MultiplierRegex = new(@"mul\(\d+,\d+\)", RegexOptions.Compiled);
-  private static readonly Regex InstructionRegex = new(@"mul\(\d+,\d+\)|do\(\)|don't\(\)", RegexOptions.Compiled);
-  
-  protected override string TestInput => @"xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))";
-
   protected override int Day => 3;
+
+  protected override string TestInput => @"987654321111111
+811111111111119
+234234234234278
+818181911112111";
 
   protected override string Problem1(string[] input, bool isTestInput)
   {
-    var total = 0;
+    DebugMode = isTestInput;
+    var joltageSum = 0L;
+
     foreach (var line in input)
     {
-      var multipliers = MultiplierRegex.Matches(line);
-      foreach (Match match in multipliers)
-      {
-        var nums = StringUtils.ExtractIntsFromString(match.Value).ToArray();
-        total += nums[0] * nums[1];
-      }
-    }
-    return total.ToString();
-  }
-
-  protected override string Problem2(string[] input, bool isTestInput)
-  {
-    //test input for problem 2 is different, annoyingly enough
-    if (isTestInput)
-    {
-      input = new [] { "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))" };
+      var numbers = line.Select(c => int.Parse(c.ToString())).ToArray();
+      var joltageRating = GetJoltageRating(numbers);
+      D(joltageRating);
+      joltageSum += joltageRating;
     }
     
-    var total = 0;
-    var instructionsOn = true;
-    foreach (var line in input)
+    return joltageSum.ToString();
+  }
+
+  private static int GetJoltageRating(int[] numbers)
+  {
+    var firstIndex = 0;
+    var firstDigit = 0;
+    for (var i = 0; i < numbers.Length - 1; i++)
     {
-      var instructions = InstructionRegex.Matches(line);
-      foreach (Match match in instructions)
+      if (numbers[i] > firstDigit)
       {
-        var stringVal = match.Value;
-        if (stringVal == "don't()")
-        {
-          instructionsOn = false;
-        }
-        else if (stringVal == "do()")
-        {
-          instructionsOn = true;
-        }
-        else
-        {
-          if (instructionsOn)
-          {
-            var nums = StringUtils.ExtractIntsFromString(match.Value).ToArray();
-            total += nums[0] * nums[1];
-          }
-        }
+        firstDigit = numbers[i];
+        firstIndex = i;
       }
     }
-    return total.ToString();
+    
+    var remaining = numbers[(firstIndex + 1)..];
+
+    var secondDigit = remaining.Max();
+
+    return (10 * firstDigit) + secondDigit;
+  }
+  
+  protected override string Problem2(string[] input, bool isTestInput)
+  {
+    DebugMode = isTestInput;
+    var joltageSum = 0L;
+
+    foreach (var line in input)
+    {
+      var numbers = line.Select(c => int.Parse(c.ToString())).ToArray();
+      var joltageRating = GetJoltageRatingRecursive(numbers, 12);
+      D(joltageRating);
+      joltageSum += joltageRating;
+    }
+    
+    return joltageSum.ToString();
+  }
+
+  private static long GetJoltageRatingRecursive(int[] numbers, int placesRemaining)
+  {
+    if (placesRemaining == 0) return 0;
+    
+    var remainingSignificance = placesRemaining - 1;
+    
+    var firstIndex = 0;
+    var firstDigit = 0;
+    for (var i = 0; i < numbers.Length - remainingSignificance; i++)
+    {
+      if (numbers[i] > firstDigit)
+      {
+        firstDigit = numbers[i];
+        firstIndex = i;
+      }
+    }
+    
+    var remaining = numbers[(firstIndex + 1)..];
+    var secondDigit = GetJoltageRatingRecursive(remaining, remainingSignificance);
+    
+    return ((long)Math.Pow(10, remainingSignificance) * firstDigit) + secondDigit;
   }
 }
