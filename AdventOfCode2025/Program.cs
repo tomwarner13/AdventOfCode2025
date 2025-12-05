@@ -28,20 +28,21 @@ void DoAllProblems(Problems probs)
 
 void TryPrintResult(Func<string> attempter, string description)
 {
+  Console.WriteLine($"[{DateTime.Now:O}] {description} starting...");
   try
   {
     var result = attempter();
 
-    Console.WriteLine($"{description}:");
-    Console.WriteLine(result);
+    Console.WriteLine($"[{DateTime.Now:O}] {description}:");
+    Console.WriteLine($"[{DateTime.Now:O}] {result}");
   }
   catch (NotImplementedException)
   {
-    Console.WriteLine($"{description} not implemented");
+    Console.WriteLine($"[{DateTime.Now:O}] {description} not implemented");
   }
   catch(Exception e)
   {
-    Console.WriteLine($"{description} failed:");
+    Console.WriteLine($"[{DateTime.Now:O}] {description} failed:");
     Console.WriteLine(e);
   }
 

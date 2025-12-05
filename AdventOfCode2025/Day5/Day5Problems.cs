@@ -59,8 +59,6 @@ public class Day5Problems : Problems
     var searchTreeRoot = new TreeNode(firstRange[0], firstRange[1]);
     D($"root node {searchTreeRoot.MinRange} to {searchTreeRoot.MaxRange}");
     
-    var freshRangeTotal = 0L;
-
     foreach (var line in input[1..])
     {
       var numbers = StringUtils.ExtractLongsFromString(line).ToArray();

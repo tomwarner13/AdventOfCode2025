@@ -79,7 +79,7 @@ public abstract class Problems
   protected void D(string message, bool appendNewLine = true)
   {
     if (!DebugMode) return;
-    if(appendNewLine) Console.WriteLine(message);
+    if(appendNewLine) Console.WriteLine($"[{DateTime.Now:O}] {message}");
     else Console.Write(message);
   }
   
@@ -91,7 +91,7 @@ public abstract class Problems
   protected void D(object? obj, bool appendNewLine = true)
   {
     if (!DebugMode) return;
-    if(appendNewLine) Console.WriteLine(obj?.ToString() ?? "nUlL");
+    if(appendNewLine) Console.WriteLine($"[{DateTime.Now:O}] {obj?.ToString() ?? "nUlL"}");
     else Console.Write(obj?.ToString() ?? "nUlL");
   }
 }
