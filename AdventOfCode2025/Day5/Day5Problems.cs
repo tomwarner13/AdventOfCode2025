@@ -83,10 +83,13 @@ public class Day5Problems : Problems
     return result.ToString();
   }
 
-  private class TreeNode
+  private class TreeNode(long minRange, long maxRange)
   {
-    public long MinRange { get; private set; }
-    public long MaxRange { get; private set; }
+    public long MinRange { get; private set; } = minRange;
+    public long MaxRange { get; private set; } = maxRange;
+
+    private long MinDescendantRange { get; set; } = minRange;
+    private long MaxDescendantRange { get; set; } = maxRange;
 
     public long TotalFreshRange()
     {
@@ -95,52 +98,48 @@ public class Day5Problems : Problems
         + (LeftChild?.TotalFreshRange() ?? 0)
         + (RightChild?.TotalFreshRange() ?? 0);
     }
-    
-    public TreeNode? LeftChild { get; private set; }
-    public TreeNode? RightChild { get; private set; }
 
-    public TreeNode(long minRange, long maxRange)
+    private TreeNode? LeftChild { get; set; }
+    private TreeNode? RightChild { get; set; }
+
+    public void AddChild(TreeNode potentialChild)
     {
-      MinRange = minRange;
-      MaxRange = maxRange;
-    }
+      ArgumentNullException.ThrowIfNull(potentialChild);
 
-    public void AddChild(TreeNode child)
-    {
-      ArgumentNullException.ThrowIfNull(child);
-
-      if (child.MinRange < MinRange) //add left
+      if (potentialChild.MinRange < MinRange) //add left
       {
-        if (child.MaxRange > MaxRange) //overlap, edit this node rather than add a child
+        MinDescendantRange = potentialChild.MinRange;
+        if (potentialChild.MaxRange > MaxRange) //overlap, edit this node rather than add a child
         {
-          MinRange = child.MinRange;
-          MaxRange = child.MaxRange;
+          MinRange = potentialChild.MinRange;
+          MaxRange = potentialChild.MaxRange;
           
-          ModifyMinRangeRecursive(child.MinRange);
-          ModifyMaxRangeRecursive(child.MaxRange);
+          ModifyMinRangeRecursive(potentialChild.MinRange);
+          ModifyMaxRangeRecursive(potentialChild.MaxRange);
         }
         else
         {
           //edit child range so no overlap
-          if(child.MaxRange >= MinRange) child.MaxRange = MinRange - 1;
+          if(potentialChild.MaxRange >= MinRange) potentialChild.MaxRange = MinRange - 1;
           
-          if (LeftChild == null) LeftChild = child;
-          else LeftChild.AddChild(child);
+          if (LeftChild == null) LeftChild = potentialChild;
+          else LeftChild.AddChild(potentialChild);
         }
       }
       else //add right
       {
-        if (child.MaxRange <= MaxRange) return; //if inner overlap, do nothing
+        if (potentialChild.MaxRange <= MaxRange) return; //if inner overlap, do nothing
+        MaxDescendantRange = potentialChild.MaxRange;
         
         //edit child range so no overlap
-        if(child.MinRange <= MaxRange) child.MinRange = MaxRange + 1;
+        if(potentialChild.MinRange <= MaxRange) potentialChild.MinRange = MaxRange + 1;
         
-        if(RightChild == null) RightChild = child;
-        else RightChild.AddChild(child);
+        if(RightChild == null) RightChild = potentialChild;
+        else RightChild.AddChild(potentialChild);
       }
     }
 
-    public void ModifyMinRangeRecursive(long newMin)
+    private void ModifyMinRangeRecursive(long newMin)
     {
       if (MinRange < newMin && MaxRange >= newMin) //edit self, kill right children
       {
@@ -150,8 +149,14 @@ public class Day5Problems : Problems
       
       var left = LeftChild;
       if (left == null) return;
+
+      if (left.MinDescendantRange >= newMin)
+      {
+        LeftChild = null;
+        return;
+      }
       
-      if(left.MinRange >= newMin) //kill this entire child
+      if(left.MinRange >= newMin) //kill this entire child, recursively
       {
         while (LeftChild != null && LeftChild.MinRange >= newMin)
         {
@@ -165,8 +170,8 @@ public class Day5Problems : Problems
         left.RightChild?.ModifyMinRangeRecursive(newMin);
       }
     }
-    
-    public void ModifyMaxRangeRecursive(long newMax)
+
+    private void ModifyMaxRangeRecursive(long newMax)
     {      
       if (MaxRange > newMax && MinRange <= newMax) //edit self, kill left children
       {
@@ -177,6 +182,12 @@ public class Day5Problems : Problems
       var right = RightChild;
       
       if (right == null) return;
+      
+      if (right.MaxDescendantRange <= newMax)
+      {
+        RightChild = null;
+        return;
+      }
       
       if(right.MaxRange <= newMax) //kill this entire child, recursively
       {
