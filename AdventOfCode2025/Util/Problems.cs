@@ -11,7 +11,7 @@ public abstract class Problems
   {
     if(_testInputLines.Length > 0) return _testInputLines;
     
-    _testInputLines = TestInput.Split('\n').Select(s => s.Trim()).ToArray();
+    _testInputLines = TestInput.Split('\n');
     return _testInputLines;
   }
 
@@ -28,7 +28,7 @@ public abstract class Problems
   }
 
   protected abstract int Day { get; }
-  protected bool DebugMode = false;
+  protected bool DebugMode;
 
   protected abstract string Problem1(string[] input, bool isTestInput);
   protected abstract string Problem2(string[] input, bool isTestInput);
