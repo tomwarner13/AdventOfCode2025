@@ -226,16 +226,14 @@ public class Day8Problems : Problems
     var topCircuit = circuits.OrderByDescending(c => c.Count).First();
     throw new ThisShouldNeverHappenException($"failed to find solution, finished with {circuits.Count} circuits, largest size {topCircuit.Count}");
   }
-
-  private class JunctionBox(TriplePoint coordinates) : IComparable<JunctionBox>, IEquatable<JunctionBox>
+  
+  private readonly struct JunctionBox(TriplePoint coordinates) : IComparable<JunctionBox>, IEquatable<JunctionBox>
   {
     public readonly TriplePoint Coordinates = coordinates;
     public readonly double AbsoluteMagnitude = MeasureMagnitude(TriplePoint.Zero, coordinates);
 
-    public int CompareTo(JunctionBox? other)
+    public int CompareTo(JunctionBox other)
     {
-      ArgumentNullException.ThrowIfNull(other);
-      
       var result = AbsoluteMagnitude.CompareTo(other.AbsoluteMagnitude);
       
       if(result != 0) return result;
@@ -247,9 +245,9 @@ public class Day8Problems : Problems
       return result != 0 ? result : Coordinates.Z.CompareTo(other.Coordinates.Z);
     }
 
-    public bool Equals(JunctionBox? other)
+    public bool Equals(JunctionBox other)
     {
-      return other?.Coordinates == Coordinates;
+      return other.Coordinates == Coordinates;
     }
 
     public static double MeasureMagnitude(TriplePoint c1, TriplePoint c2)

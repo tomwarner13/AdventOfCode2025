@@ -1,5 +1,7 @@
 ﻿namespace AdventOfCode2025.Util;
 
+using System.Diagnostics;
+
 public abstract class Problems
 {
   //TODO refactor to be an array of strings (each can be split to lines on \n) and live in a partial class in its own file
@@ -37,28 +39,47 @@ public abstract class Problems
   {
     var lines = ReadTestInput();
     DebugMode = true;
-    return Problem1(lines, true);
+    
+    var sw = Stopwatch.StartNew();
+    var result = Problem1(lines, true);
+    sw.Stop();
+    Console.WriteLine($"Elapsed: {sw.Elapsed:c}");
+    return result;
   }
 
   public string Problem2TestInput()
   {
     var lines = ReadTestInput();
     DebugMode = true;
-    return Problem2(lines, true);
+    
+    var sw = Stopwatch.StartNew();
+    var result = Problem2(lines, true);
+    sw.Stop();
+    Console.WriteLine($"Elapsed: {sw.Elapsed:c}");
+    return result;
   }
 
   public string Problem1FullInput()
   {
     var lines = ReadFullInput();
     DebugMode = false;
-    return Problem1(lines, false);
+    var sw = Stopwatch.StartNew();
+    var result = Problem1(lines, false);
+    sw.Stop();
+    Console.WriteLine($"Elapsed: {sw.Elapsed:c}");
+    return result;
   }
 
   public string Problem2FullInput()
   {
     var lines = ReadFullInput();
     DebugMode = false;
-    return Problem2(lines, false);
+    
+    var sw = Stopwatch.StartNew();
+    var result = Problem2(lines, false);
+    sw.Stop();
+    Console.WriteLine($"Elapsed: {sw.Elapsed:c}");
+    return result;
   }
 
   /// <summary>
