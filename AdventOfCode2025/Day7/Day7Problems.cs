@@ -120,11 +120,9 @@ public class Day7Problems : Problems
       }
 
       beamCounter = newBeamCounter;
-      if (DebugMode)
-      {
-        D(string.Join(',', beamCounter
+      // ReSharper disable once AccessToModifiedClosure
+      Dbe( () => string.Join(',', beamCounter
           .OrderBy(b => b.Key).Select(b => $"{b.Key}:{b.Value}")));
-      }
     }
 
     return beamCounter.Select(b => b.Value).Sum().ToString();

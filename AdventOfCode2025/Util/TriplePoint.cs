@@ -1,18 +1,13 @@
 ﻿namespace AdventOfCode2025.Util;
 
-public struct TriplePoint : IEquatable<TriplePoint>
+public readonly struct TriplePoint(int x, int y, int z) : IEquatable<TriplePoint>
 {
-  public readonly int X;
-  public readonly int Y;
-  public readonly int Z;
+  public readonly int X = x;
+  public readonly int Y = y;
+  public readonly int Z = z;
 
-  public TriplePoint(int x, int y, int z)
-  {
-    X = x;
-    Y = y;
-    Z = z;
-  }
-
+  public static TriplePoint Zero => new(0, 0, 0);
+  
   public bool Equals(TriplePoint other)
   {
     return X == other.X && Y == other.Y && Z == other.Z;
@@ -40,12 +35,12 @@ public struct TriplePoint : IEquatable<TriplePoint>
 
   public static TriplePoint operator +(TriplePoint a, TriplePoint b)
   {
-    return new TriplePoint(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
+    return new(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
   }
 
   public static TriplePoint operator -(TriplePoint a, TriplePoint b)
   {
-    return new TriplePoint(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
+    return new(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
   }
 
   public override string ToString() => $"{X}:{Y}:{Z}";

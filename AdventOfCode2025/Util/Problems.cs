@@ -62,13 +62,23 @@ public abstract class Problems
   }
 
   /// <summary>
-  /// D for Debug
+  /// D for Debug - with no params, just a writeline
   /// </summary>
-  /// <param name="message"></param>
-  /// <param name="appendNewLine"></param>
   protected void D()
   {
     if (DebugMode) Console.WriteLine();
+  }
+
+  /// <summary>
+  /// Debug Expensive - pass in an operation that only should be executed in debug mode
+  /// </summary>
+  /// <param name="expensiveOp"></param>
+  /// <param name="appendNewLine"></param>
+  protected void Dbe(Func<string> expensiveOp, bool appendNewLine = true)
+  {
+    if (!DebugMode) return;
+    var result = expensiveOp();
+    D(result, appendNewLine);
   }
   
   /// <summary>
@@ -84,9 +94,9 @@ public abstract class Problems
   }
   
   /// <summary>
-  /// D for Debug
+  /// D for Debug, will ToString() obj if exists or print nUlL if not
   /// </summary>
-  /// <param name="message"></param>
+  /// <param name="obj"></param>
   /// <param name="appendNewLine"></param>
   protected void D(object? obj, bool appendNewLine = true)
   {
