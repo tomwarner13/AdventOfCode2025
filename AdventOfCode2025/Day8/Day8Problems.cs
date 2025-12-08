@@ -31,8 +31,6 @@ public class Day8Problems : Problems
 
   protected override string Problem1(string[] input, bool isTestInput)
   {
-    throw new NotImplementedException("skipping, TODO deleteme");
-    
     var maxTrackedJunctions = isTestInput ? 10 : 1000;
     
     var boxen = new SortedSet<JunctionBox>();
@@ -135,7 +133,7 @@ public class Day8Problems : Problems
 
   protected override string Problem2(string[] input, bool isTestInput)
   {    
-    var maxTrackedJunctions = isTestInput ? 50 : 7500; //these two chosen by highly scientific W.A.G method
+    var maxTrackedJunctions = isTestInput ? 30 : 7500; //these two chosen by highly scientific W.A.G method
     var neighborsToCheckUp = isTestInput ? 20 : 300;
     
     var boxen = new SortedSet<JunctionBox>();
@@ -149,8 +147,6 @@ public class Day8Problems : Problems
       boxen.Add(box);
     }
     
-    //for each box, search up the set to find all neighbors and add to tracked connections
-    //stop when (nextMag - curMag) > connectionsByMagnitude.Max()
     var skipBoxIndices = new HashSet<int>();
     
     for (var targetNeighborIncrement = 1; targetNeighborIncrement <= neighborsToCheckUp; targetNeighborIncrement++)
@@ -193,9 +189,6 @@ public class Day8Problems : Problems
         .ToArray());
     });
     
-    //finally, build circuits
-    //probably a little suboptimal but like, it has a HashSet in it, how slow can it be?
-
     var circuits = new List<HashSet<JunctionBox>>();
 
     foreach (var connection in connectionsByMagnitude)
@@ -219,7 +212,7 @@ public class Day8Problems : Problems
           }
         }
 
-        if (circuits.Count == 1) //we did it
+        if (firstCircuit.Count == boxen.Count) //we did it
         {
           return (connection.Value.low.Coordinates.X * connection.Value.high.Coordinates.X).ToString();
         }
@@ -234,16 +227,10 @@ public class Day8Problems : Problems
     throw new ThisShouldNeverHappenException($"failed to find solution, finished with {circuits.Count} circuits, largest size {topCircuit.Count}");
   }
 
-  private class JunctionBox : IComparable<JunctionBox>, IEquatable<JunctionBox>
+  private class JunctionBox(TriplePoint coordinates) : IComparable<JunctionBox>, IEquatable<JunctionBox>
   {
-    public readonly TriplePoint Coordinates;
-    public readonly double AbsoluteMagnitude;
-
-    public JunctionBox(TriplePoint coordinates)
-    {
-      Coordinates = coordinates;
-      AbsoluteMagnitude = MeasureMagnitude(TriplePoint.Zero, coordinates);
-    }
+    public readonly TriplePoint Coordinates = coordinates;
+    public readonly double AbsoluteMagnitude = MeasureMagnitude(TriplePoint.Zero, coordinates);
 
     public int CompareTo(JunctionBox? other)
     {
