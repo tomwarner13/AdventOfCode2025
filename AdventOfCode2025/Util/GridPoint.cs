@@ -1,6 +1,6 @@
 ﻿namespace AdventOfCode2025.Util;
 
-public struct GridPoint : IEquatable<GridPoint>
+public struct GridPoint : IEquatable<GridPoint>, IComparable<GridPoint>
 {
   public int X;
   public int Y;
@@ -31,6 +31,17 @@ public struct GridPoint : IEquatable<GridPoint>
   public bool Equals(GridPoint other)
   {
     return X == other.X && Y == other.Y;
+  }
+
+  /// <summary>
+  /// Compare by Y then by X
+  /// </summary>
+  /// <param name="other"></param>
+  /// <returns></returns>
+  public int CompareTo(GridPoint other)
+  {
+    var vertCompare = Y.CompareTo(other.Y);
+    return vertCompare != 0 ? vertCompare : X.CompareTo(other.X);
   }
 
   public override bool Equals(object? obj)
