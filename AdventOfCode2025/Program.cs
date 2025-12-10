@@ -13,7 +13,7 @@ using AdventOfCode2025.Day8;
 using AdventOfCode2025.Day9;
 using AdventOfCode2025.Util;
 
-var problems = new Day9Problems();
+var problems = new Day10Problems();
 DoAllProblems(problems);
 return;
 
