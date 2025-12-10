@@ -106,6 +106,22 @@ public struct GridPoint : IEquatable<GridPoint>, IComparable<GridPoint>
     return MeasureStepwiseDistance(this, other);
   }
 
+  public IEnumerable<GridPoint> GetCardinalNeighbors()
+  {
+    foreach (var direction in CardinalDirections)
+    {
+      yield return this + direction;
+    }
+  }
+  
+  public IEnumerable<GridPoint> GetExtendedNeighbors()
+  {
+    foreach (var direction in ExtendedDirections)
+    {
+      yield return this + direction;
+    }
+  }
+
   public override string ToString() => $"{X}:{Y}";
 
   public static readonly GridPoint Up = new(0, -1);

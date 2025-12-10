@@ -19,9 +19,6 @@ public class Day9Problems : Problems
 
   protected override string Problem1(string[] input, bool isTestInput)
   {
-    //todo deleteme
-    return "not";
-    
     var xBound = 0;
     var redTiles = input
       .Select(l =>
@@ -55,16 +52,9 @@ public class Day9Problems : Problems
       }
     }
 
-    //return maxArea.ToString(); //answer: 4777816465
-    
-    throw new ThisShouldNeverHappenException($"loop terminated without answer, max area: {maxArea}");
+    return maxArea.ToString();
   }
 
-  //two problems:
-  //floodfill seems to be like o(n^10) or something like that, like literally enqueuing millions of points
-  //also the fucking grid array isn't big enough somehow and throws index out of bounds trying to draw lines
-  //literally what the fuck it's of size (maxY+2)*(maxX+2) how can it be too small. what the everloving fuck.
-  
   protected override string Problem2(string[] input, bool isTestInput)
   {
     var xBound = 0;
@@ -78,27 +68,32 @@ public class Day9Problems : Problems
         return new GridPoint(coords[0], coords[1]);
       }).ToArray();
     
-    //increase the grid size so fills can go around edges
-    xBound += 10;
-    yBound += 10;
+    //increase the grid size for drawing/calculation purposes
+    xBound += 2;
+    yBound += 2;
     
     D($"bounds: {xBound}, {yBound}");
     
-    var map = new BitArray(xBound * yBound);
+    //var map = new BitArray(xBound * yBound);
+    var boundaryLines = new HashSet<GridPoint>();
+    var lowestPoint = new GridPoint(xBound, yBound);
     
     for(var i = 0; i < redCorners.Length; i++)
     {
+      var point = redCorners[i];
+      if(lowestPoint.X > point.X) lowestPoint = point;
       var nextPoint = i == redCorners.Length - 1 ? redCorners[0] : redCorners[i + 1];
-      DrawLine(redCorners[i], nextPoint, xBound, ref map);
+      DrawLine(point, nextPoint, ref boundaryLines);
     }
     
-    DrawGrid(map, xBound);
+    D($"lowest point: {lowestPoint}");
+    PrintGrid(boundaryLines, xBound, yBound);
     
-    //use floodfill to build all points outside grid 
-    var inverseMap = FloodFill(ref map, xBound, yBound);
-    DrawGrid(inverseMap, xBound);
+    var perimeter = DrawOuterPerimeter(lowestPoint + GridPoint.Left, ref boundaryLines);
+    D("Perimeter:");
+    PrintGrid(perimeter, xBound, yBound);
     
-    //recurse through rectangles, check all edges if in bounds of inverseMap, return area of biggest
+    //recurse through rectangles, check all edges if in outer perimeter, return area of biggest
     
     var redTiles = redCorners.Order().ToArray();
     var maxArea = 0L;
@@ -121,7 +116,7 @@ public class Day9Problems : Problems
           D($"new potential max area: {area} | {lowerTile} -> {upperTile}");
           
           //check rectangle against grid of invalid spaces
-          if (!GenerateRectanglePerimeter(lowerTile, upperTile).Any(p => GetPointAt(ref inverseMap, p, xBound)))
+          if (!GenerateRectanglePerimeter(lowerTile, upperTile).Any(p => perimeter.Contains(p)))
           {
             D($"new max area: {area} | {lowerTile} -> {upperTile}");
             maxArea = area;
@@ -133,7 +128,7 @@ public class Day9Problems : Problems
     return maxArea.ToString();
   }
 
-  private static void DrawLine(GridPoint p1, GridPoint p2, int xBound, ref BitArray grid)
+  private static void DrawLine(GridPoint p1, GridPoint p2, ref HashSet<GridPoint> boundaries)
   {
     try
     {
@@ -143,14 +138,14 @@ public class Day9Problems : Problems
         {
           for (var y = p1.Y; y >= p2.Y; y--)
           {
-            grid[(y * xBound) + p1.X] = true;
+            boundaries.Add(new(p1.X, y));
           }
         }
         else //up
         {
           for (var y = p1.Y; y <= p2.Y; y++)
           {
-            grid[(y * xBound) + p1.X] = true; // 2,147,483,647 1,061,949,738
+            boundaries.Add(new(p1.X, y));
           }
         }
       }
@@ -160,14 +155,14 @@ public class Day9Problems : Problems
         {
           for (var x = p1.X; x >= p2.X; x--)
           {
-            grid[(p1.Y * xBound) + x] = true;
+            boundaries.Add(new(x, p1.Y));
           }
         }
         else //up
         {
           for (var x = p1.X; x <= p2.X; x++)
           {
-            grid[(p1.Y * xBound) + x] = true;
+            boundaries.Add(new(x, p1.Y));
           }
         }
       }
@@ -177,19 +172,68 @@ public class Day9Problems : Problems
       }
     }
     catch(Exception e)
-    {
-      grid[0] = true;
+    { 
+      //grid[0] = true;
     }
   }
 
+  private static HashSet<GridPoint> DrawOuterPerimeter(GridPoint start, ref HashSet<GridPoint> boundaries)
+  {
+    var pointsToCheck = new HashSet<GridPoint>() { start };
+    var outerPerimeter = new HashSet<GridPoint>();
+
+    while (pointsToCheck.Any())
+    {
+      var currentPoint = pointsToCheck.First();
+      if (boundaries.Contains(currentPoint))
+      {
+        throw new ThisShouldNeverHappenException($"how did {currentPoint} get here wtf");
+      }
+
+      if (!outerPerimeter.Contains(currentPoint))
+      {
+        var isOuterPerimeter = false;
+        var checkableNeighbors = new List<GridPoint>();
+        foreach (var neighbor in currentPoint.GetExtendedNeighbors())
+        {
+          if (boundaries.Contains(neighbor))
+          {
+            isOuterPerimeter = true;
+          }
+          else if (!outerPerimeter.Contains(neighbor))
+          {
+            if (boundaries.Contains(neighbor))
+            {
+              throw new ThisShouldNeverHappenException($"tried to add {neighbor} wtf");
+            }
+              
+            checkableNeighbors.Add(neighbor);
+          }
+        }
+
+        if (isOuterPerimeter)
+        {
+          outerPerimeter.Add(currentPoint);
+          pointsToCheck.UnionWith(checkableNeighbors);
+        }
+      }
+
+      pointsToCheck.Remove(currentPoint);
+    }
+
+    return outerPerimeter;
+  }
+
+  # region failed BitArray helpers
   private static BitArray FloodFill(ref BitArray map, int xBound, int yBound)
   {
     var result = new BitArray(map.Length);
-    var pointsToCheck = new Queue<GridPoint>([new(0, 0)]);
+    var pointsToCheck = new HashSet<GridPoint> { new(0,0) };
 
     do
     {
-      var currentPoint = pointsToCheck.Dequeue();
+      var currentPoint = pointsToCheck.First();
+      pointsToCheck.Remove(currentPoint);
       if (GetPointAt(ref map, currentPoint, xBound))
       {
         //we reached an edge, leave this one be
@@ -205,7 +249,7 @@ public class Day9Problems : Problems
 
       foreach (var n in neighbors)
       {
-        if (!GetPointAt(ref result, n, xBound) && !GetPointAt(ref map, currentPoint, xBound)) pointsToCheck.Enqueue(n);
+        if (!GetPointAt(ref result, n, xBound) && !GetPointAt(ref map, currentPoint, xBound)) pointsToCheck.Add(n);
       }
     } while (pointsToCheck.Count != 0);
 
@@ -218,7 +262,7 @@ public class Day9Problems : Problems
   private static bool GetPointAt(ref BitArray map, GridPoint point, int xBound)
     => map[(point.Y * xBound) + point.X];
   
-  private void DrawGrid(BitArray grid, int xBound)
+  private void PrintGrid(BitArray grid, int xBound)
   {
     if (!DebugMode) return;
     D();
@@ -233,6 +277,27 @@ public class Day9Problems : Problems
         D(sb.ToString());
         sb.Clear();
       }
+    }
+  }
+  
+  #endregion
+  
+  private void PrintGrid(HashSet<GridPoint> points, int xBound, int yBound)
+  {
+    if (!DebugMode) return;
+    D();
+
+    var sb = new StringBuilder();
+
+    for (var y = 0; y < yBound; y++)
+    {
+      for (var x = 0; x < xBound; x++)
+      {
+        sb.Append(points.Contains(new(x, y)) ? '#' : '.');
+      }
+
+      D(sb.ToString());
+      sb.Clear();
     }
   }
 
