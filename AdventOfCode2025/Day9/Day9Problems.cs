@@ -17,7 +17,7 @@ public class Day9Problems : Problems
 2,3
 7,3";
 
-  protected override string Problem1(string[] input, bool isTestInput)
+  public override string Problem1(string[] input, bool isTestInput)
   {
     var xBound = 0;
     var redTiles = input
@@ -55,7 +55,7 @@ public class Day9Problems : Problems
     return maxArea.ToString();
   }
 
-  protected override string Problem2(string[] input, bool isTestInput)
+  public override string Problem2(string[] input, bool isTestInput)
   {
     var xBound = 0;
     var yBound = 0;

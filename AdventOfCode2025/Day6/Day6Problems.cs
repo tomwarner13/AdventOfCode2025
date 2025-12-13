@@ -11,7 +11,7 @@ public class Day6Problems : Problems
   6 98  215 314
 *   +   *   +  ";
 
-  protected override string Problem1(string[] input, bool isTestInput)
+  public override string Problem1(string[] input, bool isTestInput)
   {
     var columns = input.Last()
       .Split(' ', StringSplitOptions.RemoveEmptyEntries)
@@ -31,7 +31,7 @@ public class Day6Problems : Problems
     return columns.Select(c => c.Total).Sum().ToString();
   }
 
-  protected override string Problem2(string[] input, bool isTestInput)
+  public override string Problem2(string[] input, bool isTestInput)
   {
     var currentColumn = new MathColumn('+');
     var total = 0L;

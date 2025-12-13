@@ -14,11 +14,8 @@ public partial class Day10Problems : Problems
                                          [.###.#] (0,1,2,3,4) (0,3,4) (0,1,2,4,5) (1,2) {10,11,11,5,10,5}
                                          """;
 
-  protected override string Problem1(string[] input, bool isTestInput)
+  public override string Problem1(string[] input, bool isTestInput)
   {
-    //deleteme
-    throw new NotImplementedException();
-    
     var solution = 0L;
 
     foreach (var line in input)
@@ -59,7 +56,7 @@ public partial class Day10Problems : Problems
     return solution.ToString();
   }
 
-  protected override string Problem2(string[] input, bool isTestInput)
+  public override string Problem2(string[] input, bool isTestInput)
   {
     //input parsing: get all buttons and all joltage requirements
 

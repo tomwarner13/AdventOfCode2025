@@ -9,7 +9,7 @@ public class Day2Problems : Problems
   protected override string TestInput => 
     "11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449,38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124";
 
-  protected override string Problem1(string[] input, bool isTestInput)
+  public override string Problem1(string[] input, bool isTestInput)
   {
     DebugMode = isTestInput;
     var invalidIds = 0L;
@@ -34,7 +34,7 @@ public class Day2Problems : Problems
     return invalidIds.ToString();
   }
 
-  protected override string Problem2(string[] input, bool isTestInput)
+  public override string Problem2(string[] input, bool isTestInput)
   {
     DebugMode = isTestInput;
     var invalidIds = 0L;

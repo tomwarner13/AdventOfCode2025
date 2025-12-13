@@ -17,7 +17,7 @@ L99
 R14
 L82";
 
-  protected override string Problem1(string[] input, bool isTestInput)
+  public override string Problem1(string[] input, bool isTestInput)
   {
     var zeroesEncountered = 0;
     var currentPos = 50;
@@ -47,7 +47,7 @@ L82";
     return rawResult;
   }
 
-  protected override string Problem2(string[] input, bool isTestInput)
+  public override string Problem2(string[] input, bool isTestInput)
   {
     var zeroesEncountered = 0;
     var currentPos = 50;

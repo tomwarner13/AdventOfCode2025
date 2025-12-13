@@ -8,12 +8,12 @@ public class Day11Problems : Problems
   
   protected override string TestInput => @"";
 
-  protected override string Problem1(string[] input, bool isTestInput)
+  public override string Problem1(string[] input, bool isTestInput)
   {
     throw new NotImplementedException();
   }
 
-  protected override string Problem2(string[] input, bool isTestInput)
+  public override string Problem2(string[] input, bool isTestInput)
   {
     throw new NotImplementedException();
   }

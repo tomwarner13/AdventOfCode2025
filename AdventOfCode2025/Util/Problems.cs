@@ -1,6 +1,7 @@
 ﻿namespace AdventOfCode2025.Util;
 
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 public abstract class Problems
 {
@@ -32,8 +33,8 @@ public abstract class Problems
   protected abstract int Day { get; }
   protected bool DebugMode;
 
-  protected abstract string Problem1(string[] input, bool isTestInput);
-  protected abstract string Problem2(string[] input, bool isTestInput);
+  public abstract string Problem1(string[] input, bool isTestInput);
+  public abstract string Problem2(string[] input, bool isTestInput);
 
   public string Problem1TestInput()
   {

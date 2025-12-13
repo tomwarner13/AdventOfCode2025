@@ -17,7 +17,7 @@ public class Day4Problems : Problems
 .@@@@@@@@.
 @.@.@@@.@.";
 
-  protected override string Problem1(string[] input, bool isTestInput)
+  public override string Problem1(string[] input, bool isTestInput)
   {
     var totalAccessibleRolls = 0L;
     var bounds = new GridPoint(input[0].Length, input.Length);
@@ -57,7 +57,7 @@ public class Day4Problems : Problems
     return totalAccessibleRolls.ToString();
   }
 
-  protected override string Problem2(string[] input, bool isTestInput)
+  public override string Problem2(string[] input, bool isTestInput)
   {
     //first pass through: copypasta above. build 2 hashsets: every roll, and removable rolls
     //then while removableRolls.Any():

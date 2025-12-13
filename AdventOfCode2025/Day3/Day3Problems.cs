@@ -11,7 +11,7 @@ public class Day3Problems : Problems
 234234234234278
 818181911112111";
 
-  protected override string Problem1(string[] input, bool isTestInput)
+  public override string Problem1(string[] input, bool isTestInput)
   {
     DebugMode = isTestInput;
     var joltageSum = 0L;
@@ -47,7 +47,7 @@ public class Day3Problems : Problems
     return (10 * firstDigit) + secondDigit;
   }
   
-  protected override string Problem2(string[] input, bool isTestInput)
+  public override string Problem2(string[] input, bool isTestInput)
   {
     DebugMode = isTestInput;
     var joltageSum = 0L;

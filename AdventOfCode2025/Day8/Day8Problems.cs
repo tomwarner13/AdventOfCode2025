@@ -29,7 +29,7 @@ public class Day8Problems : Problems
                                          425,690,689
                                          """;
 
-  protected override string Problem1(string[] input, bool isTestInput)
+  public override string Problem1(string[] input, bool isTestInput)
   {
     var maxTrackedJunctions = isTestInput ? 10 : 1000;
     
@@ -131,7 +131,7 @@ public class Day8Problems : Problems
     return (topThreeCircuits[0].Count * topThreeCircuits[1].Count * topThreeCircuits[2].Count).ToString();
   }
 
-  protected override string Problem2(string[] input, bool isTestInput)
+  public override string Problem2(string[] input, bool isTestInput)
   {    
     var maxTrackedJunctions = isTestInput ? 30 : 7500; //these two chosen by highly scientific W.A.G method
     var neighborsToCheckUp = isTestInput ? 20 : 300;

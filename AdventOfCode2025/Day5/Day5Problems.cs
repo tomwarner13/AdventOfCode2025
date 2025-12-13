@@ -18,7 +18,7 @@ public class Day5Problems : Problems
 17
 32";
 
-  protected override string Problem1(string[] input, bool isTestInput)
+  public override string Problem1(string[] input, bool isTestInput)
   {
     var firstRange = StringUtils.ExtractLongsFromString(input[0]).ToArray();
     var searchTreeRoot = new TreeNode(firstRange[0], firstRange[1]);
@@ -53,7 +53,7 @@ public class Day5Problems : Problems
     return freshIngredients.ToString();
   }
 
-  protected override string Problem2(string[] input, bool isTestInput)
+  public override string Problem2(string[] input, bool isTestInput)
   {
     var firstRange = StringUtils.ExtractLongsFromString(input[0]).ToArray();
     var searchTreeRoot = new TreeNode(firstRange[0], firstRange[1]);

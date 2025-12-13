@@ -25,7 +25,7 @@ public class Day7Problems : Problems
                                          ...............
                                          """;
 
-  protected override string Problem1(string[] input, bool isTestInput)
+  public override string Problem1(string[] input, bool isTestInput)
   {
     var beams = new HashSet<int>();
     var splitters = new HashSet<GridPoint>();
@@ -71,7 +71,7 @@ public class Day7Problems : Problems
     return encounteredSplitters.Count.ToString();
   }
 
-  protected override string Problem2(string[] input, bool isTestInput)
+  public override string Problem2(string[] input, bool isTestInput)
   {    
     var beamCounter = new Dictionary<int, long>();
     var splitters = new HashSet<GridPoint>();
