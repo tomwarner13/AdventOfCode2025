@@ -85,9 +85,9 @@ public abstract class Problems
   /// <summary>
   /// D for Debug - with no params, just a writeline
   /// </summary>
-  protected void D()
+  protected void D(bool force = false)
   {
-    if (DebugMode) Console.WriteLine();
+    if (DebugMode && !force) Console.WriteLine();
   }
 
   /// <summary>
@@ -95,33 +95,36 @@ public abstract class Problems
   /// </summary>
   /// <param name="expensiveOp"></param>
   /// <param name="appendNewLine"></param>
-  protected void Dbe(Func<string> expensiveOp, bool appendNewLine = true)
+  /// <param name="force"></param>
+  protected void Dbe(Func<string> expensiveOp, bool appendNewLine = true, bool force = false)
   {
-    if (!DebugMode) return;
+    if (!DebugMode && !force) return;
     var result = expensiveOp();
     D(result, appendNewLine);
   }
-  
+
   /// <summary>
   /// D for Debug
   /// </summary>
   /// <param name="message"></param>
   /// <param name="appendNewLine"></param>
-  protected void D(string message, bool appendNewLine = true)
+  /// <param name="force"></param>
+  protected void D(string message, bool appendNewLine = true, bool force = false)
   {
-    if (!DebugMode) return;
+    if (!DebugMode && !force) return;
     if(appendNewLine) Console.WriteLine($"[{DateTime.Now:O}] {message}");
     else Console.Write(message);
   }
-  
+
   /// <summary>
   /// D for Debug, will ToString() obj if exists or print nUlL if not
   /// </summary>
   /// <param name="obj"></param>
   /// <param name="appendNewLine"></param>
-  protected void D(object? obj, bool appendNewLine = true)
+  /// <param name="force"></param>
+  protected void D(object? obj, bool appendNewLine = true, bool force = false)
   {
-    if (!DebugMode) return;
+    if (!DebugMode && !force) return;
     if(appendNewLine) Console.WriteLine($"[{DateTime.Now:O}] {obj?.ToString() ?? "nUlL"}");
     else Console.Write(obj?.ToString() ?? "nUlL");
   }

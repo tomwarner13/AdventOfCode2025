@@ -32,6 +32,7 @@
     <None Remove="Day9\D9.txt" />
     <None Remove="Day4\D4.txt" />
     <None Remove="Day2\D2.txt" />
+    <None Remove="Tests\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -71,6 +72,7 @@
     <EmbeddedResource Include="Day2\D2.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Remove="Tests\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -81,6 +83,10 @@
     <Content Include="..\problemgen.sh">
       <Link>problemgen.sh</Link>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Tests\**" />
   </ItemGroup>
 
 </Project>
