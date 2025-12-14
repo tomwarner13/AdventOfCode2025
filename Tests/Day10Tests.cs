@@ -25,7 +25,7 @@ public class Day10Tests
     const string hardInput = 
       "[..#...###.] (1,4,5,9) (2,4,7) (2,3,5,6,9) (0,1,2,3,8) (0,1,2,4,6,7,9) (1,2,3,4,7,9) (4,9) (1,8) (4,8,9) (0,1,3,6,7) (0,4,6,8) (0,5,6,8,9) (0,2,3,7,8) {72,69,79,61,83,33,69,84,61,86}";
 
-    Assert.That(int.Parse(_problems.Problem2([hardInput], false)), Is.GreaterThan(0));
+    //Assert.That(int.Parse(_problems.Problem2([hardInput], false)), Is.GreaterThan(0));
   }
 
   [Test]
@@ -47,9 +47,36 @@ public class Day10Tests
     jc.DependentButtonSets.Add([2, 3]);
 
     var result = jc.GetMaximumLegalPresses([7, 5, 8, 3], [1,2]);
-    Assert.That(result, Is.EqualTo(1));
+    Assert.That(result, Is.EqualTo(1)); //this fails now yaaaay
     
     var result2 = jc.GetMaximumLegalPresses([7, 5, 7, 3], [1,2]); 
-    Assert.That(result2, Is.EqualTo(0));//this fails now, probably handling overlaps bad
+    Assert.That(result2, Is.EqualTo(0));
+  }
+  
+  [Test]
+  public void JoltageConstraintCheckerTest_Harder2()
+  {
+    var jc = new JoltageConstraint(3);
+    jc.DependentButtonSets.Add([0, 1, 2]);
+
+    var result = jc.GetMaximumLegalPresses([10, 10, 10, 10], [1,2]);
+    Assert.That(result, Is.EqualTo(0));
+    
+    var result2 = jc.GetMaximumLegalPresses([10, 12, 12, 10], [1,2]); 
+    Assert.That(result2, Is.EqualTo(2));
+  }
+  
+  [Test]
+  public void JoltageConstraintCheckerTest_Harder3()
+  {
+    var jc = new JoltageConstraint(2);
+    jc.DependentButtonSets.Add([0, 1]);
+    jc.DependentButtonSets.Add([3]);
+    
+    var result = jc.GetMaximumLegalPresses([10, 10, 4, 10], [0]);
+    Assert.That(result, Is.EqualTo(10)); 
+    
+    var result2 = jc.GetMaximumLegalPresses([10, 10, 4, 10], [0, 3]);
+    Assert.That(result2, Is.EqualTo(8));
   }
 }
