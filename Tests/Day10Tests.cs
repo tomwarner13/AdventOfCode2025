@@ -27,4 +27,29 @@ public class Day10Tests
 
     Assert.That(int.Parse(_problems.Problem2([hardInput], false)), Is.GreaterThan(0));
   }
+
+  [Test]
+  public void JoltageConstraintCheckerTest()
+  {
+    var jc = new JoltageConstraint(0);
+    jc.DependentButtonSets.Add([1]);
+    jc.DependentButtonSets.Add([2]);
+
+    var result = jc.GetMaximumLegalPresses([5, 5, 1], [1,2]);
+    Assert.That(result, Is.EqualTo(0));
+  }
+  
+  [Test]
+  public void JoltageConstraintCheckerTest_Harder()
+  {
+    var jc = new JoltageConstraint(0);
+    jc.DependentButtonSets.Add([1, 2]);
+    jc.DependentButtonSets.Add([2, 3]);
+
+    var result = jc.GetMaximumLegalPresses([7, 5, 8, 3], [1,2]);
+    Assert.That(result, Is.EqualTo(1));
+    
+    var result2 = jc.GetMaximumLegalPresses([7, 5, 7, 3], [1,2]); 
+    Assert.That(result2, Is.EqualTo(0));//this fails now, probably handling overlaps bad
+  }
 }
