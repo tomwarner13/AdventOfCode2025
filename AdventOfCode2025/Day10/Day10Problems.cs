@@ -9,10 +9,13 @@ public partial class Day10Problems : Problems
   protected override int Day => 10;
 
   protected override string TestInput => """
+                                         [.#..#..###] (0,1,3,6,7) (0,1,2,3,8) (1,4,5,9) (0,4,6,8) (4,8,9) (2,4,7) (4,9) (1,8) { 24,27,12,16,41,8,22,29,35,19 }
                                          [.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}
                                          [...#.] (0,2,3,4) (2,3) (0,4) (0,1,2) (1,2,3,4) {7,5,12,7,2}
                                          [.###.#] (0,1,2,3,4) (0,3,4) (0,1,2,4,5) (1,2) {10,11,11,5,10,5}
                                          """;
+  
+  private int _cacheHits = 0;
 
   public override string Problem1(string[] input, bool isTestInput)
   {
@@ -42,6 +45,7 @@ public partial class Day10Problems : Problems
             => buttonCombo.Sum(button => 1 << (rangeWidth - button)))
           .ToList();
 
+      //COPYPASTE THIS AND HAVE IT RETURN FALSE IF NO RESULTS AGAINST INDICATOR, ITS YOUR GOOD ILLEGAL STATE CHECKER
       //try each iteration of final buttons: 1, then 2, then 3, .... add to solution and continue when one found
       foreach (var set in CollectionUtils.GetAllCombinations(finalButtons, 1).OrderBy(s => s.Length))
       {
@@ -60,30 +64,15 @@ public partial class Day10Problems : Problems
   {
     //input parsing: get all buttons and all joltage requirements
 
-    //test first
-    var testTarget = new int[] { 10, 10, 1 };
-    var testCombos = new int[][]
-    {
-      [0, 1],
-      [0],
-      [1],
-      [0, 2],
-      [1, 2]
-    };
-    
-    var sortedTestCombos = testCombos
-      .OrderByDescending(bc => bc.Length)
-      .ThenByDescending(bc => string.Join(",", bc))
-      .ToArray();
-
-    //var testResult = GetLowestCombination(testTarget, sortedTestCombos, ref resultCache);
-
     var totalButtonPresses = 0;
     
     foreach (var line in input)
     {
       D($"starting line << {line} >> .....", force: true);
       var resultCache = new Dictionary<string, int?>();
+      var constraintCache = new Dictionary<string, JoltageConstraint>();
+      var illegalStatesCache = new Dictionary<string, bool>();
+      var buttonCombosCache = new Dictionary<string, HashSet<int>>();
       var rawButtonWires = ButtonWiringRegex().Matches(line).Select(m => m.Groups[1].Value).ToArray();
 
       var buttonCombos = rawButtonWires
@@ -97,7 +86,9 @@ public partial class Day10Problems : Problems
         .ThenByDescending(bc => string.Join(",", bc))
         .ToArray();
       
-      var minPresses = GetLowestCombination(targetJoltages, sortedButtonCombos, ref resultCache, isTopLevel: true);
+      var minPresses = 
+        GetLowestCombination(targetJoltages, sortedButtonCombos, ref resultCache, 
+          ref constraintCache, ref illegalStatesCache, ref buttonCombosCache, isTopLevel: true);
       D();
       D(line);
       D(minPresses);
@@ -134,20 +125,29 @@ public partial class Day10Problems : Problems
    */
 
   private int? GetLowestCombination(int[] targetJoltages, int[][] sortedButtons,
-    ref Dictionary<string, int?> comboCache, bool isTopLevel = false, int bestKnownAnswer = int.MaxValue)
+    ref Dictionary<string, int?> comboCache, ref Dictionary<string, JoltageConstraint> constraintCache,
+    ref Dictionary<string, bool> illegalStatesCache, ref Dictionary<string, HashSet<int>> buttonCombosCache,
+  bool isTopLevel = false)
   {
     var cacheKey = 
       $"{string.Join(',', targetJoltages)} -- {string.Join('|', sortedButtons.Select(b => string.Join('^', b)))}";
-    if (comboCache.TryGetValue(cacheKey, out var combination)) return combination;
+    if (comboCache.TryGetValue(cacheKey, out var combination))
+    {
+      _cacheHits++;
+      return combination;
+    }
 
     if (sortedButtons.Length == 0)
     {
-      comboCache[cacheKey] = null;
+      //comboCache[cacheKey] = null;
       return null;
     }
     
     var availableIndexes = new HashSet<int>();
-    foreach (var buttonCombo in sortedButtons)
+    var plausibleButtons = 
+      sortedButtons.Where(b => b.All(i => targetJoltages[i] > 0)).ToList();
+    
+    foreach (var buttonCombo in plausibleButtons)
     {
       foreach (var b in buttonCombo) availableIndexes.Add(b);
     }
@@ -155,9 +155,45 @@ public partial class Day10Problems : Problems
     //if none of the remaining buttons can work, stop eval
     if (targetJoltages.Where((t, i) => t > 0 && !availableIndexes.Contains(i)).Any())
     {
-      comboCache[cacheKey] = null;
+      //comboCache[cacheKey] = null;
       return null;
     }
+    
+    var sortedPlausibles = plausibleButtons
+      .OrderBy(b => string.Join(',', b)).ToArray();
+    var sortedPlausiblesCacheKey = string.Join('|', sortedPlausibles.Select(b => string.Join('^', b)));
+    var sortedPlausiblesAsSets = sortedPlausibles.Select(b => b.ToHashSet()).ToArray();
+    
+    //get constraints if any for each index, check against them too
+    for (var checkIndex = 0; checkIndex < targetJoltages.Length; checkIndex++)
+    {
+      if(targetJoltages[checkIndex] == 0) continue;
+
+      var constraintCacheKey = $"[{checkIndex} -> {sortedPlausiblesCacheKey}]";
+      if (!constraintCache.TryGetValue(constraintCacheKey, out var joltageConstraint))
+      {
+        joltageConstraint = new(checkIndex);
+        joltageConstraint.BuildDependents(sortedPlausiblesAsSets);
+        constraintCache[constraintCacheKey] = joltageConstraint;
+      }
+
+      if (!joltageConstraint.IsLegalState(targetJoltages))
+      {
+        //comboCache[cacheKey] = null;
+        return null;
+      }
+    }
+    
+    //now try for illegal states situation
+    var indicatorLightState = JoltageConstraint.GetIndicatorLightState(targetJoltages);
+    var illegalStateCacheKey = $"{indicatorLightState} || {sortedPlausiblesCacheKey}";
+    if (illegalStatesCache.ContainsKey(illegalStateCacheKey) && !illegalStatesCache[illegalStateCacheKey]) return null;
+    
+    var isLegalStateByIndicators = 
+      JoltageConstraint.IsLegalStateByIndicators
+        (indicatorLightState, targetJoltages.Length, sortedPlausiblesAsSets, sortedPlausiblesCacheKey, ref buttonCombosCache);
+    illegalStatesCache[illegalStateCacheKey] = isLegalStateByIndicators;
+    if (!isLegalStateByIndicators) return null;
     
     var bestAnswer = (int?)null;
     var firstButton = sortedButtons[0];
@@ -173,7 +209,7 @@ public partial class Day10Problems : Problems
     if (isTopLevel) D($"target best {targetBestAnswer}", force: true);
     if (targetBestAnswer > bestAnswer)
     {
-      comboCache[cacheKey] = null;
+      //comboCache[cacheKey] = null;
       return null;
     }
     
@@ -184,6 +220,11 @@ public partial class Day10Problems : Problems
 
     for (var pressesToAttempt = maxFirstButtonPresses; pressesToAttempt >= 0; pressesToAttempt--)
     {
+      if (isTopLevel)
+      {
+        D($"attempting {pressesToAttempt} presses of button {string.Join('^', firstButton)}", force: true);
+        D($"cache hits: {_cacheHits}");
+      }
       var nextTargetJoltages = new int[targetJoltages.Length];
       for (var i = 0; i < targetJoltages.Length; i++)
       {
@@ -205,7 +246,7 @@ public partial class Day10Problems : Problems
       
       var bestPressesRemaining = 
         GetLowestCombination(nextTargetJoltages, sortedButtons[1..],
-          ref comboCache, bestKnownAnswer: bestAnswer ?? int.MaxValue);
+          ref comboCache, ref constraintCache, ref illegalStatesCache, ref buttonCombosCache);
       if (bestPressesRemaining != null)
       {
         var answer = bestPressesRemaining.Value + pressesToAttempt;
@@ -223,7 +264,7 @@ public partial class Day10Problems : Problems
       }
     }
     
-    comboCache[cacheKey] = bestAnswer;
+    if(bestAnswer != null) comboCache[cacheKey] = bestAnswer;
     return bestAnswer;
   }
 }
