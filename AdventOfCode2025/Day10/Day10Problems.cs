@@ -17,7 +17,7 @@ public partial class Day10Problems : Problems
   private int _cacheHits = 0;
   private readonly MemoryCache _cache = new(new MemoryCacheOptions
   {
-    SizeLimit = 4096,
+    SizeLimit = 1000000,
   });
 
   private static MemoryCacheEntryOptions _defaultSizeOptions = new()
