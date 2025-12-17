@@ -31,6 +31,7 @@ public class JoltageConstraint(int targetIndex)
       }
       if(shouldAddThisSet) DependentButtonSets.Add(copiedSet);
     }
+    DependentButtonSets.RemoveAll(d => d.Count == 0);
   }
 
   public bool IsLegalState(int[] currentRemainingState)
@@ -40,13 +41,21 @@ public class JoltageConstraint(int targetIndex)
 
     var valueAtIndex = currentRemainingState[TargetIndex];
 
-    if (valueAtIndex == 0) return true;
+    if (valueAtIndex == 0 || DependentButtonSets.Count == 0) return true;
 
-    var totalPressableSets = 
-      DependentButtonSets.Sum(dep => 
-        currentRemainingState.Where((t, i) => dep.Contains(i)).Min());
+    // try
+    // {
 
-    return totalPressableSets >= valueAtIndex;
+      var totalPressableSets =
+        DependentButtonSets.Sum(dep =>
+          currentRemainingState.Where((t, i) => dep.Contains(i)).Min());
+
+       return totalPressableSets >= valueAtIndex;
+    // }
+    // catch (Exception e)
+    // {
+    //   return false;
+    // }
   }
   
   /*
@@ -137,7 +146,7 @@ public class JoltageConstraint(int targetIndex)
           => buttonCombo.Sum(button => 1 << (rangeWidth - button - 1)))
         .ToList();
 
-    var calculatedResult =  CollectionUtils.GetAllCombinations(finalButtons, 1)
+    var calculatedResult = CollectionUtils.GetAllCombinations(finalButtons, 1)
       .OrderBy(s => s.Length)
       .Select(set => set.Aggregate(0, (current, button) => current ^ button))
       .ToHashSet(); 
@@ -145,4 +154,6 @@ public class JoltageConstraint(int targetIndex)
     buttonCombosCache[buttonCombosCacheKey] = calculatedResult;
     return calculatedResult;
   }
+  
+  
 }
