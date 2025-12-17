@@ -6,8 +6,9 @@ public class Day12Problems : Problems
 {
   protected override int Day => 12;
   
-  protected override string TestInput => @"can we get a new guy to make AoC next year?";
+  protected override string TestInput => "can we get a new guy to make AoC next year?";
 
+  // https://www.reddit.com/r/adventofcode/comments/1pkjynl/2025_day_12_day_12_solutions/
   public override string Problem1(string[] input, bool isTestInput)
   {
     var regionsFitting = 0;
