@@ -13,17 +13,6 @@ public partial class Day10Problems : Problems
                                          [...#.] (0,2,3,4) (2,3) (0,4) (0,1,2) (1,2,3,4) {7,5,12,7,2}
                                          [.###.#] (0,1,2,3,4) (0,3,4) (0,1,2,4,5) (1,2) {10,11,11,5,10,5}
                                          """;
-  
-  private int _cacheHits = 0;
-  private readonly MemoryCache _cache = new(new MemoryCacheOptions
-  {
-    SizeLimit = 1000000,
-  });
-
-  private static MemoryCacheEntryOptions _defaultSizeOptions = new()
-  {
-    Size = 1
-  };
 
   public override string Problem1(string[] input, bool isTestInput)
   {
@@ -122,8 +111,8 @@ public partial class Day10Problems : Problems
       
     var indicatorLightState = DayTenProblemUtilities.GetIndicatorLightState(targetJoltages);
     var buttonCombosCacheKey = "button_combos | " + string.Join(",", buttons);
-    var buttonCombos = _cache.GetOrCreate(buttonCombosCacheKey,
-      _ => DayTenProblemUtilities.GetAllButtonCombinations(buttons), _defaultSizeOptions)!;
+    var buttonCombos = Cache.GetOrCreate(buttonCombosCacheKey,
+      _ => DayTenProblemUtilities.GetAllButtonCombinations(buttons), DefaultSizeOptions)!;
 
     var plausibleButtonCombos =
       buttonCombos.Where(b => CanReachTargetStateCached(indicatorLightState, b));
@@ -155,8 +144,8 @@ public partial class Day10Problems : Problems
   private bool CanReachTargetStateCached(int indicatorLightState, int[] buttonCombo)
   {
     var cacheKey = $"target_state | {indicatorLightState} {string.Join(',', buttonCombo)}";
-    return  _cache.GetOrCreate(cacheKey,
-      _ => DayTenProblemUtilities.CanReachTargetState(indicatorLightState, buttonCombo), _defaultSizeOptions);
+    return  Cache.GetOrCreate(cacheKey,
+      _ => DayTenProblemUtilities.CanReachTargetState(indicatorLightState, buttonCombo), DefaultSizeOptions);
   }
 
   #region museum of failure
@@ -169,7 +158,6 @@ public partial class Day10Problems : Problems
       $"{string.Join(',', targetJoltages)} -- {string.Join('|', sortedButtons.Select(b => string.Join('^', b)))}";
     if (comboCache.TryGetValue(cacheKey, out var combination))
     {
-      _cacheHits++;
       return combination;
     }
 
@@ -264,7 +252,6 @@ public partial class Day10Problems : Problems
       if (isTopLevel)
       {
         D($"attempting {pressesToAttempt} presses of button {string.Join('^', firstButton)}", force: true);
-        D($"cache hits: {_cacheHits}");
       }
       var nextTargetJoltages = new int[targetJoltages.Length];
       for (var i = 0; i < targetJoltages.Length; i++)

@@ -2,6 +2,7 @@
 
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Caching.Memory;
 
 public abstract class Problems
 {
@@ -9,6 +10,17 @@ public abstract class Problems
   protected abstract string TestInput { get; }
   
   private string[] _testInputLines = [];
+  
+  
+  protected readonly MemoryCache Cache = new(new MemoryCacheOptions
+  {
+    SizeLimit = 1000000,
+  });
+
+  protected static readonly MemoryCacheEntryOptions DefaultSizeOptions = new()
+  {
+    Size = 1
+  };
 
   private string[] ReadTestInput()
   {
@@ -44,6 +56,7 @@ public abstract class Problems
     var sw = Stopwatch.StartNew();
     var result = Problem1(lines, true);
     sw.Stop();
+    Cache.Clear();
     Console.WriteLine($"Elapsed: {sw.Elapsed:c}");
     return result;
   }
@@ -56,6 +69,7 @@ public abstract class Problems
     var sw = Stopwatch.StartNew();
     var result = Problem2(lines, true);
     sw.Stop();
+    Cache.Clear();
     Console.WriteLine($"Elapsed: {sw.Elapsed:c}");
     return result;
   }
@@ -67,6 +81,7 @@ public abstract class Problems
     var sw = Stopwatch.StartNew();
     var result = Problem1(lines, false);
     sw.Stop();
+    Cache.Clear();
     Console.WriteLine($"Elapsed: {sw.Elapsed:c}");
     return result;
   }
@@ -79,6 +94,7 @@ public abstract class Problems
     var sw = Stopwatch.StartNew();
     var result = Problem2(lines, false);
     sw.Stop();
+    Cache.Clear();
     Console.WriteLine($"Elapsed: {sw.Elapsed:c}");
     return result;
   }
